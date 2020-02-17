@@ -17,7 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-@Import(ConsumerTestConfig.class)
+@Import(ProducerTestConfig.class)
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.kafka.topic.boot=" + AccountConsumerIT.TOPIC})
 @EmbeddedKafka(topics = AccountConsumerIT.TOPIC,
