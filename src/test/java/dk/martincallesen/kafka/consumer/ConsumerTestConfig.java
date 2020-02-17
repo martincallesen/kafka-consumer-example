@@ -1,5 +1,6 @@
 package dk.martincallesen.kafka.consumer;
 
+import dk.martincallesen.datamodel.event.Account;
 import dk.martincallesen.datamodel.event.SpecificRecordAdapter;
 import dk.martincallesen.serializer.KafkaSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -30,12 +31,12 @@ class ConsumerTestConfig {
     }
 
     @Bean
-    public ProducerFactory<String, SpecificRecordAdapter> producerFactory() {
+    public ProducerFactory<String, SpecificRecordAdapter<Account>> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
 
     @Bean
-    public KafkaTemplate<String, SpecificRecordAdapter> kafkaTemplate() {
+    public KafkaTemplate<String, SpecificRecordAdapter<Account>> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 }
