@@ -2,7 +2,6 @@ package dk.martincallesen.kafka.consumer;
 
 import dk.martincallesen.datamodel.event.Account;
 import dk.martincallesen.datamodel.event.SpecificRecordAdapter;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 @SpringBootTest(properties = {"spring.kafka.topic.boot=" + AccountConsumerIT.TOPIC})
 @EmbeddedKafka(topics = AccountConsumerIT.TOPIC,
         bootstrapServersProperty = "spring.kafka.bootstrap-servers")
-public class AccountConsumerIT implements ConsumerListener {
+public class AccountConsumerIT implements AccountConsumerListener {
     public static final String TOPIC = "test-account-topic";
     private CountDownLatch latch;
     private Account receivedAccountRecord;
@@ -31,7 +30,7 @@ public class AccountConsumerIT implements ConsumerListener {
     private KafkaTemplate<String, SpecificRecordAdapter<Account>> producer;
 
     @Autowired
-    private SpecificRecordConsumer consumer;
+    private AccountConsumer consumer;
 
     @BeforeEach
     void setupConsumer() {
@@ -52,8 +51,8 @@ public class AccountConsumerIT implements ConsumerListener {
     }
 
     @Override
-    public void recordProcessed(ConsumerRecord<String, SpecificRecordAdapter<Account>> consumerRecord) {
-        receivedAccountRecord = consumerRecord.value().getRecord();
+    public void recordProcessed(String key, Account consumerRecord) {
+        receivedAccountRecord = consumerRecord;
         latch.countDown();
     }
 }
