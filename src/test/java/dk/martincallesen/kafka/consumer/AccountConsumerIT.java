@@ -27,7 +27,7 @@ public class AccountConsumerIT implements AccountConsumerListener {
     private Account receivedAccountRecord;
 
     @Autowired
-    private KafkaTemplate<String, SpecificRecordAdapter<Account>> producer;
+    private KafkaTemplate<String, SpecificRecordAdapter> producer;
 
     @Autowired
     private AccountConsumer consumer;
@@ -45,7 +45,7 @@ public class AccountConsumerIT implements AccountConsumerListener {
                 .setReg(1234)
                 .setNumber(1234567890)
                 .build();
-        producer.send(TOPIC, new SpecificRecordAdapter<>(accountChange));
+        producer.send(TOPIC, new SpecificRecordAdapter(accountChange));
         latch.await(10, TimeUnit.SECONDS);
         Assertions.assertEquals(accountChange, receivedAccountRecord, "Record received");
     }

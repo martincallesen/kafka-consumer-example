@@ -18,7 +18,7 @@ public class KafkaDeserializer implements Deserializer<SpecificRecordAdapter> {
     @Override
     public SpecificRecordAdapter deserialize(String topic, byte[] data) {
         try {
-            return new SpecificRecordAdapter<>((Account) deserializer.deserialize(topic, data));
+            return new SpecificRecordAdapter(deserializer.deserialize(topic, data));
         } catch (Exception ex) {
             throw new SerializationException(
                     "Can't deserialize data '" + Arrays.toString(data) + "' from topic '" + topic + "'", ex);

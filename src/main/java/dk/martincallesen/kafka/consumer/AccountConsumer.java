@@ -14,8 +14,8 @@ public class AccountConsumer {
     private Logger logger = LoggerFactory.getLogger(AccountConsumer.class);
 
     @KafkaListener(topics = "${spring.kafka.topic.boot}", groupId="${spring.kafka.consumer.group.id}")
-    public void processMessage(ConsumerRecord<String, SpecificRecordAdapter<Account>> consumerRecord){
-        Account account = consumerRecord.value().getRecord();
+    public void processMessage(ConsumerRecord<String, SpecificRecordAdapter> consumerRecord){
+        Account account = (Account) consumerRecord.value().getRecord();
         logger.info("Received message: {} ", account);
 
         if(listener != null) {
