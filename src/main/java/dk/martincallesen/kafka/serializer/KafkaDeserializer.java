@@ -12,7 +12,7 @@ public class KafkaDeserializer implements Deserializer<SpecificRecordAdapter> {
     private SpecificRecordDeserializer deserializer;
 
     public KafkaDeserializer() {
-        this.deserializer = new SpecificRecordDeserializer<>(Account.class);
+        this.deserializer = new SpecificRecordDeserializer<Account>(new Account().getSchema());
     }
 
     @Override
