@@ -1,6 +1,9 @@
 package dk.martincallesen.kafka.consumer;
 
+import dk.martincallesen.datamodel.event.Account;
+import dk.martincallesen.datamodel.event.Customer;
 import dk.martincallesen.datamodel.event.SpecificRecordAdapter;
+import dk.martincallesen.datamodel.event.SpecificRecordDeserializer;
 import dk.martincallesen.kafka.serializer.KafkaDeserializer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -23,20 +26,41 @@ public class KafkaConsumerConfig {
 
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
+    @Value("${spring.kafka.topic.account}")
+    private String accountTopic;
+    @Value("${spring.kafka.topic.customer}")
+    private String customerTopic;
 
     @Bean
     public Map<String, Object> consumerConfigs() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaDeserializer.class);
 
         return props;
     }
 
     @Bean
     public ConsumerFactory<String, SpecificRecordAdapter> consumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(consumerConfigs());
+        return new DefaultKafkaConsumerFactory<>(consumerConfigs(), keySerializer(), valueSerializer());
+    }
+
+    @Bean
+    public Map<String, SpecificRecordDeserializer> topicDeserializer(){
+        final HashMap<String, SpecificRecordDeserializer> map = new HashMap<>();
+        map.put(accountTopic, new SpecificRecordDeserializer<Account>(new Account().getSchema()));
+        map.put(customerTopic, new SpecificRecordDeserializer<Customer>(new Customer().getSchema()));
+
+        return map;
+    }
+
+    @Bean
+    public KafkaDeserializer valueSerializer() {
+        return new KafkaDeserializer(topicDeserializer());
+    }
+
+    @Bean
+    public StringDeserializer keySerializer() {
+        return new StringDeserializer();
     }
 
     @Bean
@@ -45,6 +69,7 @@ public class KafkaConsumerConfig {
         factory.setConsumerFactory(consumerFactory());
         factory.setConcurrency(3);
         factory.getContainerProperties().setPollTimeout(3000);
+
         return factory;
     }
 }

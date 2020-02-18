@@ -1,6 +1,7 @@
 package dk.martincallesen.kafka.consumer;
 
 import dk.martincallesen.datamodel.event.Account;
+import dk.martincallesen.datamodel.event.Customer;
 import dk.martincallesen.datamodel.event.SpecificRecordAdapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,13 +18,17 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Import(ProducerTestConfig.class)
+@Import(TestConfiguration.class)
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.kafka.topic.boot=" + RecordConsumerIT.TOPIC})
-@EmbeddedKafka(topics = RecordConsumerIT.TOPIC,
+@SpringBootTest(properties = {
+        "spring.kafka.topic.account=" + RecordConsumerIT.ACCOUNT_TOPIC,
+        "spring.kafka.topic.customer=" + RecordConsumerIT.CUSTOMER_TOPIC
+})
+@EmbeddedKafka(topics = RecordConsumerIT.ACCOUNT_TOPIC,
         bootstrapServersProperty = "spring.kafka.bootstrap-servers")
 public class RecordConsumerIT implements RecordConsumerListener {
-    public static final String TOPIC = "test-account-topic";
+    public static final String ACCOUNT_TOPIC = "test-account-topic";
+    public static final String CUSTOMER_TOPIC = "test-customer-topic";
     private CountDownLatch latch;
     private SpecificRecordAdapter receivedRecord;
 
@@ -47,7 +52,23 @@ public class RecordConsumerIT implements RecordConsumerListener {
                 .setNumber(1234567890)
                 .build();
         final SpecificRecordAdapter expectedRecord = new SpecificRecordAdapter(accountChange);
-        producer.send(TOPIC, expectedRecord);
+        producer.send(ACCOUNT_TOPIC, expectedRecord);
+        latch.await(10, TimeUnit.SECONDS);
+        assertEquals(expectedRecord, receivedRecord, "Record received");
+    }
+
+    @Test
+    void consumeCustomerChange() throws InterruptedException {
+        final Customer customerChange = Customer.newBuilder()
+                .setFirstName("Michael")
+                .setLastName("Hansen")
+                .setAge(30)
+                .setHeight(180)
+                .setWeight(85)
+                .setAutomatedEmail(true)
+                .build();
+        final SpecificRecordAdapter expectedRecord = new SpecificRecordAdapter(customerChange);
+        producer.send(CUSTOMER_TOPIC, expectedRecord);
         latch.await(10, TimeUnit.SECONDS);
         assertEquals(expectedRecord, receivedRecord, "Record received");
     }

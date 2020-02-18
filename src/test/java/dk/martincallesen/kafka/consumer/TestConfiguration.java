@@ -1,6 +1,9 @@
 package dk.martincallesen.kafka.consumer;
 
+import dk.martincallesen.datamodel.event.Account;
+import dk.martincallesen.datamodel.event.Customer;
 import dk.martincallesen.datamodel.event.SpecificRecordAdapter;
+import dk.martincallesen.datamodel.event.SpecificRecordDeserializer;
 import dk.martincallesen.serializer.KafkaSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -15,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-class ProducerTestConfig {
+class TestConfiguration {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 

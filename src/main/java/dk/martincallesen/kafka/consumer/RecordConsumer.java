@@ -12,7 +12,7 @@ public class RecordConsumer {
     private RecordConsumerListener listener;
     private Logger logger = LoggerFactory.getLogger(RecordConsumer.class);
 
-    @KafkaListener(topics = "${spring.kafka.topic.boot}", groupId="${spring.kafka.consumer.group.id}")
+    @KafkaListener(topics = {"${spring.kafka.topic.account}", "${spring.kafka.topic.customer}"}, groupId="${spring.kafka.consumer.group.id}")
     public void processRecord(ConsumerRecord<String, SpecificRecordAdapter> consumerRecord){
         final SpecificRecordAdapter record = consumerRecord.value();
         logger.info("Received record: {} ", record);
