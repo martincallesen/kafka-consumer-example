@@ -2,7 +2,6 @@ package dk.martincallesen.kafka.consumer;
 
 import dk.martincallesen.datamodel.event.Account;
 import dk.martincallesen.datamodel.event.SpecificRecordAdapter;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,21 +15,23 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @Import(ProducerTestConfig.class)
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.kafka.topic.boot=" + AccountConsumerIT.TOPIC})
-@EmbeddedKafka(topics = AccountConsumerIT.TOPIC,
+@SpringBootTest(properties = {"spring.kafka.topic.boot=" + RecordConsumerIT.TOPIC})
+@EmbeddedKafka(topics = RecordConsumerIT.TOPIC,
         bootstrapServersProperty = "spring.kafka.bootstrap-servers")
-public class AccountConsumerIT implements AccountConsumerListener {
+public class RecordConsumerIT implements RecordConsumerListener {
     public static final String TOPIC = "test-account-topic";
     private CountDownLatch latch;
-    private Account receivedAccountRecord;
+    private SpecificRecordAdapter receivedRecord;
 
     @Autowired
     private KafkaTemplate<String, SpecificRecordAdapter> producer;
 
     @Autowired
-    private AccountConsumer consumer;
+    private RecordConsumer consumer;
 
     @BeforeEach
     void setupConsumer() {
@@ -45,14 +46,15 @@ public class AccountConsumerIT implements AccountConsumerListener {
                 .setReg(1234)
                 .setNumber(1234567890)
                 .build();
-        producer.send(TOPIC, new SpecificRecordAdapter(accountChange));
+        final SpecificRecordAdapter expectedRecord = new SpecificRecordAdapter(accountChange);
+        producer.send(TOPIC, expectedRecord);
         latch.await(10, TimeUnit.SECONDS);
-        Assertions.assertEquals(accountChange, receivedAccountRecord, "Record received");
+        assertEquals(expectedRecord, receivedRecord, "Record received");
     }
 
     @Override
-    public void recordProcessed(String key, Account consumerRecord) {
-        receivedAccountRecord = consumerRecord;
+    public void recordProcessed(String key, SpecificRecordAdapter record) {
+        receivedRecord = record;
         latch.countDown();
     }
 }
