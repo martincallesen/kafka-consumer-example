@@ -1,6 +1,5 @@
 package dk.martincallesen.kafka.serializer;
 
-import dk.martincallesen.datamodel.event.Account;
 import dk.martincallesen.datamodel.event.SpecificRecordAdapter;
 import dk.martincallesen.datamodel.event.SpecificRecordDeserializer;
 import org.apache.kafka.common.errors.SerializationException;
