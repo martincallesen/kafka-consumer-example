@@ -36,12 +36,16 @@ public class RecordConsumerIT implements RecordConsumerListener {
     private KafkaTemplate<String, SpecificRecordAdapter> producer;
 
     @Autowired
-    private RecordConsumer consumer;
+    private AccountRecordConsumer accountConsumer;
+
+    @Autowired
+    private CustomerRecordConsumer customerConsumer;
 
     @BeforeEach
     void setupConsumer() {
         latch = new CountDownLatch(1);
-        consumer.setListener(this);
+        accountConsumer.setListener(this);
+        customerConsumer.setListener(this);
     }
 
     @Test
@@ -51,8 +55,11 @@ public class RecordConsumerIT implements RecordConsumerListener {
                 .setReg(1234)
                 .setNumber(1234567890)
                 .build();
-        final SpecificRecordAdapter expectedRecord = new SpecificRecordAdapter(accountChange);
-        producer.send(ACCOUNT_TOPIC, expectedRecord);
+        consumeChange(new SpecificRecordAdapter(accountChange), ACCOUNT_TOPIC);
+    }
+
+    private void consumeChange(SpecificRecordAdapter expectedRecord, String topic) throws InterruptedException {
+        producer.send(topic, expectedRecord);
         latch.await(10, TimeUnit.SECONDS);
         assertEquals(expectedRecord, receivedRecord, "Record received");
     }
@@ -67,10 +74,7 @@ public class RecordConsumerIT implements RecordConsumerListener {
                 .setWeight(85)
                 .setAutomatedEmail(true)
                 .build();
-        final SpecificRecordAdapter expectedRecord = new SpecificRecordAdapter(customerChange);
-        producer.send(CUSTOMER_TOPIC, expectedRecord);
-        latch.await(10, TimeUnit.SECONDS);
-        assertEquals(expectedRecord, receivedRecord, "Record received");
+        consumeChange(new SpecificRecordAdapter(customerChange), CUSTOMER_TOPIC);
     }
 
     @Override
