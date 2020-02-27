@@ -8,11 +8,11 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RecordConsumer {
+public class AccountRecordConsumer {
     private RecordConsumerListener listener;
-    private Logger logger = LoggerFactory.getLogger(RecordConsumer.class);
+    private Logger logger = LoggerFactory.getLogger(AccountRecordConsumer.class);
 
-    @KafkaListener(topics = {"${spring.kafka.topic.account}", "${spring.kafka.topic.customer}"}, groupId="${spring.kafka.consumer.group.id}")
+    @KafkaListener(topics = "${spring.kafka.topic.account}", groupId="${spring.kafka.consumer.group.id}")
     public void processRecord(ConsumerRecord<String, SpecificRecordAdapter> consumerRecord){
         final SpecificRecordAdapter record = consumerRecord.value();
         logger.info("Received record: {} ", record);
