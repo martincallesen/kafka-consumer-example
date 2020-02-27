@@ -24,11 +24,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         "spring.kafka.topic.account=" + RecordConsumerIT.ACCOUNT_TOPIC,
         "spring.kafka.topic.customer=" + RecordConsumerIT.CUSTOMER_TOPIC
 })
-@EmbeddedKafka(topics = RecordConsumerIT.ACCOUNT_TOPIC,
+@EmbeddedKafka(topics = {RecordConsumerIT.ACCOUNT_TOPIC, RecordConsumerIT.CUSTOMER_TOPIC},
         bootstrapServersProperty = "spring.kafka.bootstrap-servers")
 public class RecordConsumerIT implements RecordConsumerListener {
-    public static final String ACCOUNT_TOPIC = "test-account-topic";
-    public static final String CUSTOMER_TOPIC = "test-customer-topic";
+    static final String ACCOUNT_TOPIC = "test-account-topic";
+    static final String CUSTOMER_TOPIC = "test-customer-topic";
     private CountDownLatch latch;
     private SpecificRecordAdapter receivedRecord;
 
